@@ -7,6 +7,7 @@ package server
 import (
 	"fmt"
 	"net"
+	"strings"
 	"sync"
 
 	"golang.org/x/net/ipv4"
@@ -202,6 +203,10 @@ func (l *listener6) Serve() error {
 
 		n, oob, peer, err := l.ReadFrom(b)
 		if err != nil {
+			// This is expected when listener was closed
+			if strings.Contains(err.Error(), "use of closed network connection") {
+				return nil
+			}
 			log.Printf("Error reading from connection: %v", err)
 			return err
 		}
@@ -218,6 +223,10 @@ func (l *listener4) Serve() error {
 
 		n, oob, peer, err := l.ReadFrom(b)
 		if err != nil {
+			// This is expected when listener was closed
+			if strings.Contains(err.Error(), "use of closed network connection") {
+				return nil
+			}
 			log.Printf("Error reading from connection: %v", err)
 			return err
 		}
